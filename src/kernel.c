@@ -83,6 +83,15 @@ static void hcf(void) {
         asm ("hlt");
     }
 }
+
+static void draw_rect(struct limine_framebuffer *fb, int x, int y, int width, int height, uint32_t colour) {
+    uint32_t *fb_ptr = fb->address;
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            fb_ptr[fb->width * (y + i) + x + j] = colour;
+        }
+    }
+}
  
 // The following will be our kernel's entry point.
 // If renaming _start() to something else, make sure to change the
@@ -103,10 +112,12 @@ void _start(void) {
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
  
     // Note: we assume the framebuffer model is RGB with 32-bit pixels.
-    for (size_t i = 0; i < 100; i++) {
-        uint32_t *fb_ptr = framebuffer->address;
-        fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
-    }
+    draw_rect(framebuffer, 50, 50, 100, 40, 0xff0000);
+    // for (size_t i = 0; i < 100; i++) {
+    //     uint32_t *fb_ptr = framebuffer->address;
+    //     // fb_ptr[i * (framebuffer->pitch / 4) + i] = 0xffffff;
+    //     fb_ptr[i] = 0xffffff;
+    // }
  
     // We're done, just hang...
     hcf();
